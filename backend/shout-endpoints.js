@@ -86,7 +86,7 @@ router.post('/add_shout.php', (req, res) => {
     // Create new shout
     const newShout = {
       text: sanitizedText,
-      timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
+      timestamp: Date.now(),
       id: `shout_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     };
     

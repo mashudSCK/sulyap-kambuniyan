@@ -97,7 +97,11 @@ function displayShoutouts(shouts) {
   }
   
   // Sort by timestamp, newest first
-  const sortedShouts = shouts.sort((a, b) => new Date(b.timestamp.replace(' ', 'T')) - new Date(a.timestamp.replace(' ', 'T')));
+  const sortedShouts = shouts.sort((a, b) => {
+    const timeA = typeof a.timestamp === 'number' ? a.timestamp : new Date(a.timestamp.replace(' ', 'T')).getTime();
+    const timeB = typeof b.timestamp === 'number' ? b.timestamp : new Date(b.timestamp.replace(' ', 'T')).getTime();
+    return timeB - timeA;
+  });
   
   shoutsContainer.innerHTML = sortedShouts.map(shout => {
     const timeAgo = getTimeAgo(shout.timestamp);
@@ -116,11 +120,10 @@ function displayShoutouts(shouts) {
 
 // Get "time ago" string
 function getTimeAgo(timestamp) {
-  // Handle both ISO format and space-separated format
-  const dateStr = timestamp.replace(' ', 'T');
-  const date = new Date(dateStr);
-  const now = new Date();
-  const seconds = Math.floor((now - date) / 1000);
+  // Handle both Unix timestamp (number) and string formats for backward compatibility
+  const timestampMs = typeof timestamp === 'number' ? timestamp : new Date(timestamp.replace(' ', 'T')).getTime();
+  const now = Date.now();
+  const seconds = Math.floor((now - timestampMs) / 1000);
   
   if (seconds < 60) return 'just now';
   if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
