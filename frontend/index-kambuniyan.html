@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sulyap: Kambuniyan Edition - SKSU Kambuniyan Week 2025. Connect anonymously with students from all seven campuses.">
+    <title>Sulyap: Kambuniyan Edition - SKSU 2025</title>
+    <link rel="stylesheet" href="styles-kambuniyan.css">
+</head>
+<body>
+    <!-- Kambuniyan Event Banner -->
+    <div class="kambuniyan-banner">
+        <div class="banner-content">
+            <div class="banner-icon">🎉</div>
+            <div class="banner-text">
+                <h2 class="banner-title">SKSU Kambuniyan Week 2025</h2>
+                <p class="banner-subtitle">Isang sulyap sa pagkakaisa ng pitong campus</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Landing Screen -->
+    <div id="landing-screen" class="screen active">
+        <div class="container">
+            <!-- Kambuniyan Logo -->
+            <div class="logo">
+                <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="40" cy="40" r="35" stroke="#0B6E4F" stroke-width="3" fill="none" opacity="0.3"/>
+                    <circle cx="40" cy="40" r="28" stroke="#F2C94C" stroke-width="2.5" fill="none"/>
+                    <path d="M40 20 L50 35 L65 35 L52 45 L58 60 L40 50 L22 60 L28 45 L15 35 L30 35 Z" fill="#0B6E4F" opacity="0.8"/>
+                </svg>
+            </div>
+            
+            <h1 class="title">Sulyap</h1>
+            <div class="edition-badge">Kambuniyan Edition 2025</div>
+            <p class="subtitle">Makipag-usap nang anonymous sa mga estudyante mula sa ibang campus. Isang sulyap, isang koneksyon.</p>
+            
+            <!-- Online Users Counter -->
+            <div class="online-counter">
+                <span class="online-dot"></span>
+                <span id="online-count">0</span> <span class="online-text">online ngayon</span>
+            </div>
+            
+            <!-- Temporary Username Input -->
+            <div class="username-container">
+                <input 
+                    type="text" 
+                    id="username-input" 
+                    class="username-input" 
+                    placeholder="Say hi to someone from another campus..."
+                    maxlength="20"
+                >
+                <p class="username-hint">✨ O manatiling "Stranger"</p>
+            </div>
+            
+            <button id="start-btn" class="btn btn-primary">
+                <span>Magsimula ng Pag-uusap</span>
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M7 4L13 10L7 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+            
+            <div class="features">
+                <div class="feature">
+                    <span class="feature-icon">🔒</span>
+                    <span>Anonymous</span>
+                </div>
+                <div class="feature">
+                    <span class="feature-icon">⚡</span>
+                    <span>Instant</span>
+                </div>
+                <div class="feature">
+                    <span class="feature-icon">🌿</span>
+                    <span>Fleeting</span>
+                </div>
+            </div>
+
+            <!-- Shout-Out Wall Section -->
+            <div class="shoutout-section">
+                <div class="shoutout-header">
+                    <h3 class="shoutout-title">📣 Kambuniyan Shout-Out Wall</h3>
+                    <p class="shoutout-subtitle">Mag-iwan ng mensahe para sa lahat!</p>
+                </div>
+
+                <!-- Shout-Out Form -->
+                <div class="shoutout-form-container">
+                    <form id="shoutout-form" class="shoutout-form">
+                        <textarea 
+                            id="shoutout-input" 
+                            class="shoutout-input" 
+                            placeholder="Ano ang nais mong ibahagi sa Kambuniyan Week? 🎉"
+                            maxlength="200"
+                            rows="3"
+                        ></textarea>
+                        <div class="shoutout-controls">
+                            <span class="char-counter"><span id="shout-char-count">0</span>/200</span>
+                            <button type="submit" class="btn btn-shout">
+                                <span>Mag-Shout Out!</span>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 19V5M5 12L12 5L19 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Shout-Outs Display -->
+                <div class="shoutouts-container" id="shoutouts-container">
+                    <div class="loading-shouts">Loading shout-outs...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Waiting Screen -->
+    <div id="waiting-screen" class="screen">
+        <div class="container">
+            <div class="status-icon">
+                <div class="spinner"></div>
+            </div>
+            <h2 class="status-title">Naghahanap ng ka-chat...</h2>
+            <p class="status-message">Sandali lang, konektado ka na maya-maya</p>
+            <button id="cancel-waiting-btn" class="btn btn-secondary">Kanselahin</button>
+        </div>
+    </div>
+
+    <!-- Chat Screen -->
+    <div id="chat-screen" class="screen">
+        <div class="chat-container">
+            <!-- Fixed Chat Header -->
+            <div class="chat-header fixed-header">
+                <div class="header-content">
+                    <div class="header-left">
+                        <div class="logo-small">
+                            <svg width="32" height="32" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="40" cy="40" r="28" stroke="#0B6E4F" stroke-width="2.5" fill="none"/>
+                                <path d="M40 20 L45 30 L55 30 L47 37 L50 47 L40 40 L30 47 L33 37 L25 30 L35 30 Z" fill="#F2C94C"/>
+                            </svg>
+                        </div>
+                        <div class="chat-names">
+                            <div class="status-indicator">
+                                <span class="status-dot"></span>
+                                <span class="status-text">Connected</span>
+                            </div>
+                            <div class="name-display">
+                                <span id="your-name-text" class="chatting-with-text">Nakikipag-usap ka kay Stranger</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="end-chat-btn" class="btn-icon" title="Tapusin ang Chat">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Messages Area -->
+            <div id="messages-container" class="messages-container">
+                <div class="system-message">
+                    <p>🎉 Nakakonekta ka na! Simulan ang pag-uusap.</p>
+                </div>
+            </div>
+            
+            <!-- Typing Indicator -->
+            <div id="typing-indicator" class="typing-indicator" style="display: none;">
+                <span class="typing-text">Typing</span>
+                <span class="typing-dots">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </span>
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-container">
+                <!-- Reply Preview -->
+                <div id="reply-preview" class="reply-preview" style="display: none;">
+                    <div class="reply-preview-content">
+                        <div class="reply-icon">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M3.5 8H12.5M3.5 8L7 4.5M3.5 8L7 11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="reply-text">
+                            <div id="reply-label" class="reply-label">Replying to</div>
+                            <div id="reply-message-text" class="reply-message-text"></div>
+                        </div>
+                    </div>
+                    <button id="cancel-reply-btn" class="cancel-reply-btn" title="Cancel reply">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <form id="message-form" class="message-form">
+                    <input 
+                        type="text" 
+                        id="message-input" 
+                        class="message-input" 
+                        placeholder="I-type ang iyong mensahe..."
+                        autocomplete="off"
+                        maxlength="500"
+                    >
+                    <button type="submit" class="btn-send" title="Ipadala">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Disconnected Screen -->
+    <div id="disconnected-screen" class="screen">
+        <div class="container">
+            <div class="status-icon">
+                <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+                    <circle cx="40" cy="40" r="35" stroke="#DDB892" stroke-width="3" fill="none"/>
+                    <path d="M28 28L52 52M52 28L28 52" stroke="#0B6E4F" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <h2 class="status-title">Natapos ang Chat</h2>
+            <p class="status-message" id="disconnect-message">Umalis ang iyong ka-chat.</p>
+            
+            <button id="new-chat-btn" class="btn btn-primary">Maghanap ng Bagong Ka-chat</button>
+            <button id="feedback-btn" class="btn btn-secondary">Mag-iwan ng Feedback</button>
+        </div>
+    </div>
+
+    <!-- Exit Confirmation Modal -->
+    <div id="exit-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-character">
+                <div class="sad-face">
+                    <div class="eyes">
+                        <span class="eye">•́</span>
+                        <span class="eye">•̀</span>
+                    </div>
+                    <div class="mouth">⌓</div>
+                </div>
+                <p class="modal-message">Aalis ka na?</p>
+            </div>
+            <h3 class="modal-title">Tapusin ang Sulyap?</h3>
+            <p class="modal-subtitle">Mawawala na ang inyong pag-uusap...</p>
+            <div class="modal-buttons">
+                <button id="modal-stay-btn" class="btn btn-secondary">Manatili</button>
+                <button id="modal-end-btn" class="btn btn-danger">Tapusin</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Modal -->
+    <div id="feedback-modal" class="modal">
+        <div class="modal-content feedback-modal-content">
+            <button class="modal-close-btn" id="close-feedback-btn" title="Close">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </button>
+            <h3 class="modal-title">💭 Ano'ng say mo?</h3>
+            <p class="modal-subtitle">Tulungan kaming mapabuti ang Sulyap</p>
+            
+            <div class="rating-section">
+                <p class="rating-label">Kamusta ang iyong experience?</p>
+                <div class="star-rating" id="star-rating">
+                    <span class="star" data-rating="1">⭐</span>
+                    <span class="star" data-rating="2">⭐</span>
+                    <span class="star" data-rating="3">⭐</span>
+                    <span class="star" data-rating="4">⭐</span>
+                    <span class="star" data-rating="5">⭐</span>
+                </div>
+            </div>
+            
+            <div class="feedback-form">
+                <textarea 
+                    id="feedback-text" 
+                    class="feedback-textarea" 
+                    placeholder="Ibahagi ang iyong komento... (opsyonal)"
+                    maxlength="500"
+                    rows="4"
+                ></textarea>
+                <div class="char-count">
+                    <span id="char-count">0</span>/500
+                </div>
+            </div>
+            
+            <div class="modal-buttons">
+                <button id="submit-feedback-btn" class="btn btn-primary">Ipadala ang Feedback</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Thank You Modal -->
+    <div id="thankyou-modal" class="modal">
+        <div class="modal-content thankyou-modal-content">
+            <div class="thankyou-animation">
+                <div class="heart-emoji">💚</div>
+            </div>
+            <h3 class="modal-title">Salamat sa iyong Sulyap!</h3>
+            <p class="modal-subtitle">Ang iyong feedback ay makakatulong sa atin</p>
+        </div>
+    </div>
+
+    <!-- Audio element for notification sound -->
+    <audio id="notification-sound" preload="auto">
+        <source src="assets/sounds/Matched-Notify.wav" type="audio/wav">
+    </audio>
+
+    <!-- Socket.IO Client Library -->
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- App JavaScript -->
+    <script src="app-kambuniyan.js"></script>
+</body>
+</html>
