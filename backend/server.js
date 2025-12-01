@@ -23,7 +23,6 @@ app.use(cors({
   credentials: true
 }));
 
-app.use(express.static(path.join(__dirname, '../frontend')));
 app.use(express.json());
 
 // NEW: Enable shout-out endpoints
@@ -33,6 +32,9 @@ app.use('/', shoutRouter);
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/index-kambuniyan.html'));
 });
+
+// Serve static files AFTER the root route to prevent index.html from overriding
+app.use(express.static(path.join(__dirname, '../frontend')));
 
 const waitingQueue = [];
 const activePairs = new Map();
