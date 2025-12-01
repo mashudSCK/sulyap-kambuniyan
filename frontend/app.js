@@ -23,24 +23,19 @@ const usernameInput = document.getElementById('username-input');
 const onlineCountElement = document.getElementById('online-count');
 const typingIndicator = document.getElementById('typing-indicator');
 const yourNameText = document.getElementById('your-name-text');
-const partnerNameText = document.getElementById('partner-name-text');
 
 // Modal elements
 const exitModal = document.getElementById('exit-modal');
 const modalStayBtn = document.getElementById('modal-stay-btn');
 const modalEndBtn = document.getElementById('modal-end-btn');
 
-// NEW: Reply functionality elements
+// Reply functionality elements
 const replyPreview = document.getElementById('reply-preview');
 const replyMessageText = document.getElementById('reply-message-text');
 const replyLabel = document.getElementById('reply-label');
 const cancelReplyBtn = document.getElementById('cancel-reply-btn');
 
-// NEW: Referral elements
-const copyLinkBtn = document.getElementById('copy-link-btn');
-const referralLinkInput = document.getElementById('referral-link-input');
-
-// NEW: Feedback elements
+// Feedback elements
 const feedbackBtn = document.getElementById('feedback-btn');
 const feedbackModal = document.getElementById('feedback-modal');
 const closeFeedbackBtn = document.getElementById('close-feedback-btn');
@@ -51,35 +46,194 @@ const charCount = document.getElementById('char-count');
 const submitFeedbackBtn = document.getElementById('submit-feedback-btn');
 const thankyouModal = document.getElementById('thankyou-modal');
 
-// NEW: Notification sound
+// Notification sound
 const notificationSound = document.getElementById('notification-sound');
+
+// NEW: Shout-out elements
+const shoutoutForm = document.getElementById('shoutout-form');
+const shoutoutInput = document.getElementById('shoutout-input');
+const shoutoutCharCount = document.getElementById('shout-char-count');
+const shoutsContainer = document.getElementById('shoutouts-container');
 
 // State variables
 let isInChat = false;
 let typingTimeout = null;
 let replyingToMessage = null;
-let replyingToMessageId = null; // NEW: Track message ID for scroll-to-original
+let replyingToMessageId = null;
 let selectedRating = 0;
-let messageCounter = 0; // NEW: Assign unique IDs to messages
+let messageCounter = 0;
+let shoutRefreshInterval = null;
 
 // Get referral parameter from URL
 const urlParams = new URLSearchParams(window.location.search);
 const referralCode = urlParams.get('ref') || '';
-if (referralCode) {
-  console.log('🔗 Referred by:', referralCode);
+
+// ================================
+// SHOUT-OUT WALL FUNCTIONS
+// ================================
+
+// Load shout-outs from server
+async function loadShoutouts() {
+  try {
+    const response = await fetch('/get_shouts.php');
+    const data = await response.json();
+    
+    if (data.success && Array.isArray(data.shouts)) {
+      displayShoutouts(data.shouts);
+    } else {
+      shoutsContainer.innerHTML = '<div class="no-shouts">Wala pang shout-outs. Maging una!</div>';
+    }
+  } catch (error) {
+    console.error('Error loading shout-outs:', error);
+    shoutsContainer.innerHTML = '<div class="loading-shouts">Error loading shout-outs</div>';
+  }
 }
+
+// Display shout-outs
+function displayShoutouts(shouts) {
+  if (shouts.length === 0) {
+    shoutsContainer.innerHTML = '<div class="no-shouts">Wala pang shout-outs. Maging una!</div>';
+    return;
+  }
+  
+  // Sort by timestamp, newest first
+  const sortedShouts = shouts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  
+  shoutsContainer.innerHTML = sortedShouts.map(shout => {
+    const date = new Date(shout.timestamp);
+    const timeAgo = getTimeAgo(date);
+    
+    return `
+      <div class="shoutout-item">
+        <div class="shoutout-text">${escapeHtml(shout.text)}</div>
+        <div class="shoutout-meta">
+          <span class="shoutout-icon">🌿</span>
+          <span>${timeAgo}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Get "time ago" string
+function getTimeAgo(date) {
+  const seconds = Math.floor((new Date() - date) / 1000);
+  
+  if (seconds < 60) return 'just now';
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+  return `${Math.floor(seconds / 86400)}d ago`;
+}
+
+// Submit shout-out
+async function submitShoutout(text) {
+  try {
+    const response = await fetch('/add_shout.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ text: text })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      shoutoutInput.value = '';
+      shoutoutCharCount.textContent = '0';
+      loadShoutouts(); // Reload to show new shout
+      
+      // Show success feedback
+      showShoutoutSuccess();
+    } else {
+      alert(data.message || 'Error posting shout-out');
+    }
+  } catch (error) {
+    console.error('Error submitting shout-out:', error);
+    alert('Error posting shout-out. Please try again.');
+  }
+}
+
+// Show success animation
+function showShoutoutSuccess() {
+  const btn = shoutoutForm.querySelector('.btn-shout');
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '<span>✓ Posted!</span>';
+  btn.style.background = 'linear-gradient(135deg, #0B6E4F, #0E8F65)';
+  
+  setTimeout(() => {
+    btn.innerHTML = originalText;
+    btn.style.background = '';
+  }, 2000);
+}
+
+// Shout-out form submission
+shoutoutForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const text = shoutoutInput.value.trim();
+  
+  if (text.length === 0) {
+    alert('Please enter a message');
+    return;
+  }
+  
+  if (text.length > 200) {
+    alert('Message is too long (max 200 characters)');
+    return;
+  }
+  
+  submitShoutout(text);
+});
+
+// Character counter for shout-out
+shoutoutInput.addEventListener('input', () => {
+  const length = shoutoutInput.value.length;
+  shoutoutCharCount.textContent = length;
+  
+  // Change color when approaching limit
+  if (length > 180) {
+    shoutoutCharCount.style.color = '#C44536';
+  } else if (length > 150) {
+    shoutoutCharCount.style.color = '#F2C94C';
+  } else {
+    shoutoutCharCount.style.color = '';
+  }
+});
+
+// Auto-refresh shout-outs every 10 seconds
+function startShoutoutRefresh() {
+  if (shoutRefreshInterval) {
+    clearInterval(shoutRefreshInterval);
+  }
+  shoutRefreshInterval = setInterval(() => {
+    loadShoutouts();
+  }, 10000); // 10 seconds
+}
+
+// Stop auto-refresh
+function stopShoutoutRefresh() {
+  if (shoutRefreshInterval) {
+    clearInterval(shoutRefreshInterval);
+    shoutRefreshInterval = null;
+  }
+}
+
+// ================================
+// CORE CHAT FUNCTIONS
+// ================================
 
 function showScreen(screen) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   screen.classList.add('active');
+  
   if (screen === chatScreen) {
     messageInput.focus();
-  }
-  
-  // Update referral link with current username
-  if (screen === disconnectedScreen) {
-    const username = usernameInput.value.trim() || 'friend';
-    referralLinkInput.value = `https://sulyap.onrender.com/?ref=${encodeURIComponent(username)}`;
+    stopShoutoutRefresh(); // Stop refreshing when in chat
+  } else if (screen === landingScreen) {
+    loadShoutouts(); // Load when returning to landing
+    startShoutoutRefresh(); // Start auto-refresh
+  } else {
+    stopShoutoutRefresh();
   }
 }
 
@@ -87,7 +241,6 @@ function addMessage(text, type = 'received', messageId = null, replyData = null)
   const messageDiv = document.createElement('div');
   messageDiv.className = `message ${type}`;
   
-  // Assign unique message ID
   if (!messageId) {
     messageId = `msg-${Date.now()}-${messageCounter++}`;
   }
@@ -96,7 +249,6 @@ function addMessage(text, type = 'received', messageId = null, replyData = null)
   const bubbleDiv = document.createElement('div');
   bubbleDiv.className = 'message-bubble';
   
-  // NEW: Add reply quote if this is a reply (Messenger-style)
   if (replyData) {
     bubbleDiv.classList.add('with-reply');
     
@@ -116,7 +268,6 @@ function addMessage(text, type = 'received', messageId = null, replyData = null)
       </div>
     `;
     
-    // NEW: Click on reply quote to scroll to original message
     replyQuote.addEventListener('click', (e) => {
       e.stopPropagation();
       scrollToOriginalMessage(replyData.originalMessageId);
@@ -125,13 +276,11 @@ function addMessage(text, type = 'received', messageId = null, replyData = null)
     bubbleDiv.appendChild(replyQuote);
   }
   
-  // Add message text
   const messageText = document.createElement('div');
   messageText.className = 'message-text';
   messageText.textContent = text;
   bubbleDiv.appendChild(messageText);
   
-  // NEW: Add click event for reply functionality (only for received messages)
   if (type === 'received') {
     bubbleDiv.addEventListener('click', () => {
       if (isInChat) {
@@ -149,7 +298,6 @@ function addMessage(text, type = 'received', messageId = null, replyData = null)
   return messageDiv;
 }
 
-// NEW: Scroll to and highlight original message
 function scrollToOriginalMessage(messageId) {
   const originalMessage = document.querySelector(`[data-message-id="${messageId}"]`);
   if (originalMessage) {
@@ -162,7 +310,6 @@ function scrollToOriginalMessage(messageId) {
   }
 }
 
-// NEW: Escape HTML to prevent XSS
 function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
@@ -181,12 +328,11 @@ function clearMessages() {
   messagesContainer.innerHTML = '';
 }
 
-// NEW: Reply functionality
 function setReplyMessage(message, messageId) {
   replyingToMessage = message;
-  replyingToMessageId = messageId; // Store for scroll-to-original
+  replyingToMessageId = messageId;
   replyMessageText.textContent = message;
-  replyLabel.textContent = 'Replying to'; // Show "Replying to" while composing
+  replyLabel.textContent = 'Replying to';
   replyPreview.style.display = 'flex';
   messageInput.focus();
 }
@@ -197,14 +343,17 @@ function clearReplyMessage() {
   replyPreview.style.display = 'none';
 }
 
-// NEW: Play notification sound
 function playNotificationSound() {
-  notificationSound.volume = 0.4; // Set to 40% for softer, more pleasant sound
+  notificationSound.volume = 0.4;
   notificationSound.currentTime = 0;
   notificationSound.play().catch(err => {
     console.log('Could not play notification sound:', err);
   });
 }
+
+// ================================
+// EVENT LISTENERS
+// ================================
 
 startBtn.addEventListener('click', () => {
   const username = usernameInput.value.trim() || 'Stranger';
@@ -229,9 +378,8 @@ modalEndBtn.addEventListener('click', () => {
   hideExitModal();
   socket.emit('end-chat');
   isInChat = false;
-  disconnectMessage.textContent = 'You ended the chat.';
+  disconnectMessage.textContent = 'Natapos mo ang chat.';
   showScreen(disconnectedScreen);
-  clearUsername();
 });
 
 newChatBtn.addEventListener('click', () => {
@@ -244,7 +392,6 @@ messageForm.addEventListener('submit', (e) => {
   e.preventDefault();
   const message = messageInput.value.trim();
   if (message && isInChat) {
-    // NEW: Create reply data for Messenger-style layout
     let replyData = null;
     if (replyingToMessage && replyingToMessageId) {
       replyData = {
@@ -253,10 +400,8 @@ messageForm.addEventListener('submit', (e) => {
       };
     }
     
-    // Add message with reply data
-    const sentMessageId = addMessage(message, 'sent', null, replyData);
+    addMessage(message, 'sent', null, replyData);
     
-    // Send to server (include reply info)
     const messageData = {
       message: message,
       replyTo: replyData ? {
@@ -267,7 +412,7 @@ messageForm.addEventListener('submit', (e) => {
     
     socket.emit('send-message', messageData);
     messageInput.value = '';
-    clearReplyMessage(); // Clear reply after sending
+    clearReplyMessage();
     messageInput.focus();
     socket.emit('stop-typing');
   }
@@ -286,6 +431,12 @@ messageInput.addEventListener('input', () => {
   }, 1000);
 });
 
+cancelReplyBtn.addEventListener('click', clearReplyMessage);
+
+// ================================
+// SOCKET EVENT HANDLERS
+// ================================
+
 socket.on('waiting', (data) => {
   showScreen(waitingScreen);
 });
@@ -293,26 +444,21 @@ socket.on('waiting', (data) => {
 socket.on('chat-start', (data) => {
   isInChat = true;
   clearMessages();
-  clearReplyMessage(); // NEW: Clear any reply state
-  messageCounter = 0; // Reset message counter for new chat
+  clearReplyMessage();
+  messageCounter = 0;
   showScreen(chatScreen);
   
-  // Update header with partner's name
-  yourNameText.textContent = `You are chatting with ${data.partnerName}`;
-  partnerNameText.style.display = 'none';
+  yourNameText.textContent = `Nakikipag-usap ka kay ${data.partnerName}`;
   
-  // NEW: Play notification sound when matched
   playNotificationSound();
   
-  // Add system message with animation
   setTimeout(() => {
-    addSystemMessage('🎉 You\'re now connected! Start the conversation.');
+    addSystemMessage('🎉 Nakakonekta ka na! Simulan ang pag-uusap.');
   }, 300);
 });
 
 socket.on('receive-message', (data) => {
   if (isInChat) {
-    // NEW: Handle reply data if present
     let replyData = null;
     if (data.replyTo) {
       replyData = {
@@ -328,15 +474,12 @@ socket.on('partner-left', (data) => {
   isInChat = false;
   disconnectMessage.textContent = data.message;
   showScreen(disconnectedScreen);
-  clearUsername();
 });
 
-// Online count
 socket.on('online-count', (data) => {
   onlineCountElement.textContent = data.count;
 });
 
-// Typing indicators
 socket.on('partner-typing', () => {
   if (typingIndicator) {
     typingIndicator.style.display = 'block';
@@ -349,70 +492,18 @@ socket.on('partner-stop-typing', () => {
   }
 });
 
-socket.on('connect_error', (error) => {
-  console.error('Connection error:', error);
-});
-
 socket.on('disconnect', (reason) => {
   if (isInChat) {
     isInChat = false;
-    disconnectMessage.textContent = 'Connection lost. Please check your internet.';
+    disconnectMessage.textContent = 'Nawala ang koneksyon. I-check ang internet.';
     showScreen(disconnectedScreen);
-    clearUsername();
   }
 });
 
-// Modal functions
-function showExitModal() {
-  exitModal.classList.add('active');
-}
+// ================================
+// FEEDBACK MODAL
+// ================================
 
-function hideExitModal() {
-  exitModal.classList.remove('active');
-}
-
-function clearUsername() {
-  yourNameText.textContent = 'Stranger';
-  partnerNameText.textContent = 'Stranger';
-}
-
-// NEW: Reply button event listener
-cancelReplyBtn.addEventListener('click', clearReplyMessage);
-
-// NEW: Referral copy link functionality
-copyLinkBtn.addEventListener('click', () => {
-  referralLinkInput.select();
-  document.execCommand('copy');
-  
-  // Visual feedback
-  copyLinkBtn.classList.add('copied');
-  const originalHTML = copyLinkBtn.innerHTML;
-  copyLinkBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M15 4.5L6.75 12.75L3 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  
-  setTimeout(() => {
-    copyLinkBtn.classList.remove('copied');
-    copyLinkBtn.innerHTML = originalHTML;
-  }, 2000);
-});
-
-// NEW: Social share buttons
-document.querySelector('.share-btn.facebook').addEventListener('click', () => {
-  const url = encodeURIComponent(referralLinkInput.value);
-  window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank', 'width=600,height=400');
-});
-
-document.querySelector('.share-btn.messenger').addEventListener('click', () => {
-  const url = encodeURIComponent(referralLinkInput.value);
-  window.open(`fb-messenger://share/?link=${url}`, '_blank');
-});
-
-document.querySelector('.share-btn.twitter').addEventListener('click', () => {
-  const url = encodeURIComponent(referralLinkInput.value);
-  const text = encodeURIComponent('Just had an amazing fleeting conversation on Sulyap! Try it out:');
-  window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank', 'width=600,height=400');
-});
-
-// NEW: Feedback modal functionality
 feedbackBtn.addEventListener('click', () => {
   feedbackModal.classList.add('active');
   selectedRating = 0;
@@ -425,7 +516,6 @@ closeFeedbackBtn.addEventListener('click', () => {
   feedbackModal.classList.remove('active');
 });
 
-// NEW: Star rating functionality
 stars.forEach(star => {
   star.addEventListener('click', () => {
     selectedRating = parseInt(star.dataset.rating);
@@ -458,15 +548,13 @@ stars.forEach(star => {
   });
 });
 
-// NEW: Character count for feedback
 feedbackText.addEventListener('input', () => {
   charCount.textContent = feedbackText.value.length;
 });
 
-// NEW: Submit feedback
 submitFeedbackBtn.addEventListener('click', () => {
   if (selectedRating === 0) {
-    alert('Please select a rating before submitting.');
+    alert('Pumili ng rating bago mag-submit.');
     return;
   }
   
@@ -477,27 +565,34 @@ submitFeedbackBtn.addEventListener('click', () => {
     referralCode: referralCode
   };
   
-  // Send feedback to server
   socket.emit('submit-feedback', feedbackData);
   
-  // Show thank you modal
   feedbackModal.classList.remove('active');
   thankyouModal.classList.add('active');
   
-  // Auto-close thank you modal after 3 seconds
   setTimeout(() => {
     thankyouModal.classList.remove('active');
   }, 3000);
 });
 
-// Close modal on outside click
+// ================================
+// MODAL HELPERS
+// ================================
+
+function showExitModal() {
+  exitModal.classList.add('active');
+}
+
+function hideExitModal() {
+  exitModal.classList.remove('active');
+}
+
 exitModal.addEventListener('click', (e) => {
   if (e.target === exitModal) {
     hideExitModal();
   }
 });
 
-// NEW: Close feedback modals on outside click
 feedbackModal.addEventListener('click', (e) => {
   if (e.target === feedbackModal) {
     feedbackModal.classList.remove('active');
@@ -513,50 +608,19 @@ thankyouModal.addEventListener('click', (e) => {
 window.addEventListener('beforeunload', (e) => {
   if (isInChat) {
     e.preventDefault();
-    e.returnValue = 'You are in an active chat. Are you sure you want to leave?';
+    e.returnValue = 'Nasa aktibong chat ka. Sigurado kang aalis?';
     return e.returnValue;
   }
 });
 
-// NEW: Mobile swipe gesture for reply (optional enhancement)
-let touchStartX = 0;
-let touchStartY = 0;
-let touchEndX = 0;
-let touchEndY = 0;
+// ================================
+// INITIALIZATION
+// ================================
 
-messagesContainer.addEventListener('touchstart', (e) => {
-  if (e.target.closest('.message-bubble')) {
-    touchStartX = e.changedTouches[0].screenX;
-    touchStartY = e.changedTouches[0].screenY;
-  }
-}, false);
+// Load shout-outs on page load
+loadShoutouts();
+startShoutoutRefresh();
 
-messagesContainer.addEventListener('touchend', (e) => {
-  const bubble = e.target.closest('.message-bubble');
-  if (bubble && isInChat) {
-    touchEndX = e.changedTouches[0].screenX;
-    touchEndY = e.changedTouches[0].screenY;
-    handleSwipeGesture(bubble);
-  }
-}, false);
-
-function handleSwipeGesture(bubble) {
-  const swipeDistanceX = touchEndX - touchStartX;
-  const swipeDistanceY = Math.abs(touchEndY - touchStartY);
-  
-  // Check if it's a horizontal swipe (not vertical scroll)
-  if (Math.abs(swipeDistanceX) > 50 && swipeDistanceY < 50) {
-    const messageDiv = bubble.closest('.message');
-    const messageId = messageDiv.dataset.messageId;
-    const messageText = bubble.querySelector('.message-text');
-    const message = messageText ? messageText.textContent : bubble.textContent;
-    
-    setReplyMessage(message, messageId);
-    bubble.classList.add('replying');
-    setTimeout(() => bubble.classList.remove('replying'), 300);
-  }
-}
-
-console.log('🌟 Sulyap initialized - Fleeting conversations await');
-console.log('✨ Enhanced features: Fixed Header, Messenger-style Reply, Soft Notifications, Referrals, Feedback');
-console.log('💜 Polished UX: Better spacing, smooth animations, scroll-to-original');
+console.log('🌿 Sulyap: Kambuniyan Edition initialized');
+console.log('🎉 SKSU Kambuniyan Week 2025');
+console.log('📣 Shout-out wall: ACTIVE');

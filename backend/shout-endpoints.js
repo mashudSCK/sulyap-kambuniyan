@@ -2,7 +2,7 @@
  * Shout-Out Endpoints for Node.js
  * SKSU Kambuniyan Week 2025 - Sulyap Kambuniyan Edition
  * 
- * This replaces PHP endpoints for Render deployment
+ * REST API endpoints for the shout-out wall feature
  */
 
 const express = require('express');

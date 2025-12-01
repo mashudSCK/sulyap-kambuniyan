@@ -25,15 +25,10 @@ app.use(cors({
 
 app.use(express.json());
 
-// NEW: Enable shout-out endpoints
+// Enable shout-out endpoints
 app.use('/', shoutRouter);
 
-// Serve Kambuniyan Edition as default homepage
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/index-kambuniyan.html'));
-});
-
-// Serve static files AFTER the root route to prevent index.html from overriding
+// Serve static files
 app.use(express.static(path.join(__dirname, '../frontend')));
 
 const waitingQueue = [];

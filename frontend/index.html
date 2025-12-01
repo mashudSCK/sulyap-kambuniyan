@@ -1,31 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Sulyap - Fleeting anonymous conversations. Connect, chat, and let go.">
-    <title>Sulyap - Anonymous Fleeting Conversations</title>
-    <link rel="stylesheet" href="styles.css">
+    <meta name="description" content="Sulyap: Kambuniyan Edition - SKSU Kambuniyan Week 2025. Connect anonymously with students from all seven campuses.">
+    <title>Sulyap: Kambuniyan Edition - SKSU 2025</title>
+    <link rel="stylesheet" href="styles-kambuniyan.css">
 </head>
 <body>
+    <!-- Kambuniyan Event Banner -->
+    <div class="kambuniyan-banner">
+        <div class="banner-content">
+            <div class="banner-icon">🎉</div>
+            <div class="banner-text">
+                <h2 class="banner-title">SKSU Kambuniyan Week 2025</h2>
+                <p class="banner-subtitle">Isang sulyap sa pagkakaisa ng pitong campus</p>
+            </div>
+        </div>
+    </div>
+
     <!-- Landing Screen -->
     <div id="landing-screen" class="screen active">
         <div class="container">
+            <!-- Kambuniyan Logo -->
             <div class="logo">
-                <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="5" y="15" width="25" height="30" rx="4" stroke="#6366F1" stroke-width="3" fill="none"/>
-                    <rect x="30" y="15" width="25" height="30" rx="4" stroke="#8B5CF6" stroke-width="3" fill="none"/>
-                    <circle cx="15" cy="25" r="2" fill="#6366F1"/>
-                    <circle cx="40" cy="25" r="2" fill="#8B5CF6"/>
+                <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="40" cy="40" r="35" stroke="#0B6E4F" stroke-width="3" fill="none" opacity="0.3"/>
+                    <circle cx="40" cy="40" r="28" stroke="#F2C94C" stroke-width="2.5" fill="none"/>
+                    <path d="M40 20 L50 35 L65 35 L52 45 L58 60 L40 50 L22 60 L28 45 L15 35 L30 35 Z" fill="#0B6E4F" opacity="0.8"/>
                 </svg>
             </div>
+            
             <h1 class="title">Sulyap</h1>
-            <p class="subtitle">Fleeting conversations with strangers. A brief glance, then it's gone. No registration, no traces.</p>
+            <div class="edition-badge">Kambuniyan Edition 2025</div>
+            <p class="subtitle">Makipag-usap nang anonymous sa mga estudyante mula sa ibang campus. Isang sulyap, isang koneksyon.</p>
             
             <!-- Online Users Counter -->
             <div class="online-counter">
                 <span class="online-dot"></span>
-                <span id="online-count">0</span> <span class="online-text">users online</span>
+                <span id="online-count">0</span> <span class="online-text">online ngayon</span>
             </div>
             
             <!-- Temporary Username Input -->
@@ -34,14 +47,14 @@
                     type="text" 
                     id="username-input" 
                     class="username-input" 
-                    placeholder="Enter a name (optional)"
+                    placeholder="Say hi to someone from another campus..."
                     maxlength="20"
                 >
-                <p class="username-hint">✨ Or stay anonymous as "Stranger"</p>
+                <p class="username-hint">✨ O manatiling "Stranger"</p>
             </div>
             
             <button id="start-btn" class="btn btn-primary">
-                <span>Start Chatting</span>
+                <span>Magsimula ng Pag-uusap</span>
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <path d="M7 4L13 10L7 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
@@ -50,15 +63,50 @@
             <div class="features">
                 <div class="feature">
                     <span class="feature-icon">🔒</span>
-                    <span>100% Anonymous</span>
+                    <span>Anonymous</span>
                 </div>
                 <div class="feature">
                     <span class="feature-icon">⚡</span>
-                    <span>Instant Connection</span>
+                    <span>Instant</span>
                 </div>
                 <div class="feature">
-                    <span class="feature-icon">🗑️</span>
-                    <span>No Data Stored</span>
+                    <span class="feature-icon">🌿</span>
+                    <span>Fleeting</span>
+                </div>
+            </div>
+
+            <!-- Shout-Out Wall Section -->
+            <div class="shoutout-section">
+                <div class="shoutout-header">
+                    <h3 class="shoutout-title">📣 Kambuniyan Shout-Out Wall</h3>
+                    <p class="shoutout-subtitle">Mag-iwan ng mensahe para sa lahat!</p>
+                </div>
+
+                <!-- Shout-Out Form -->
+                <div class="shoutout-form-container">
+                    <form id="shoutout-form" class="shoutout-form">
+                        <textarea 
+                            id="shoutout-input" 
+                            class="shoutout-input" 
+                            placeholder="Ano ang nais mong ibahagi sa Kambuniyan Week? 🎉"
+                            maxlength="200"
+                            rows="3"
+                        ></textarea>
+                        <div class="shoutout-controls">
+                            <span class="char-counter"><span id="shout-char-count">0</span>/200</span>
+                            <button type="submit" class="btn btn-shout">
+                                <span>Mag-Shout Out!</span>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 19V5M5 12L12 5L19 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Shout-Outs Display -->
+                <div class="shoutouts-container" id="shoutouts-container">
+                    <div class="loading-shouts">Loading shout-outs...</div>
                 </div>
             </div>
         </div>
@@ -70,9 +118,9 @@
             <div class="status-icon">
                 <div class="spinner"></div>
             </div>
-            <h2 class="status-title">Finding a chat partner...</h2>
-            <p class="status-message">This usually takes just a few seconds</p>
-            <button id="cancel-waiting-btn" class="btn btn-secondary">Cancel</button>
+            <h2 class="status-title">Naghahanap ng ka-chat...</h2>
+            <p class="status-message">Sandali lang, konektado ka na maya-maya</p>
+            <button id="cancel-waiting-btn" class="btn btn-secondary">Kanselahin</button>
         </div>
     </div>
 
@@ -84,11 +132,9 @@
                 <div class="header-content">
                     <div class="header-left">
                         <div class="logo-small">
-                            <svg width="32" height="32" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <rect x="5" y="15" width="25" height="30" rx="4" stroke="#6366F1" stroke-width="3" fill="none"/>
-                                <rect x="30" y="15" width="25" height="30" rx="4" stroke="#8B5CF6" stroke-width="3" fill="none"/>
-                                <circle cx="15" cy="25" r="2" fill="#6366F1"/>
-                                <circle cx="40" cy="25" r="2" fill="#8B5CF6"/>
+                            <svg width="32" height="32" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="40" cy="40" r="28" stroke="#0B6E4F" stroke-width="2.5" fill="none"/>
+                                <path d="M40 20 L45 30 L55 30 L47 37 L50 47 L40 40 L30 47 L33 37 L25 30 L35 30 Z" fill="#F2C94C"/>
                             </svg>
                         </div>
                         <div class="chat-names">
@@ -97,12 +143,11 @@
                                 <span class="status-text">Connected</span>
                             </div>
                             <div class="name-display">
-                                <span id="your-name-text" class="chatting-with-text">You are chatting with Stranger</span>
-                                <span id="partner-name-text" style="display: none;"></span>
+                                <span id="your-name-text" class="chatting-with-text">Nakikipag-usap ka kay Stranger</span>
                             </div>
                         </div>
                     </div>
-                    <button id="end-chat-btn" class="btn-icon" title="End Chat">
+                    <button id="end-chat-btn" class="btn-icon" title="Tapusin ang Chat">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                             <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                         </svg>
@@ -113,7 +158,7 @@
             <!-- Messages Area -->
             <div id="messages-container" class="messages-container">
                 <div class="system-message">
-                    <p>🎉 You're now connected! Start the conversation.</p>
+                    <p>🎉 Nakakonekta ka na! Simulan ang pag-uusap.</p>
                 </div>
             </div>
             
@@ -154,11 +199,11 @@
                         type="text" 
                         id="message-input" 
                         class="message-input" 
-                        placeholder="Type your message..."
+                        placeholder="I-type ang iyong mensahe..."
                         autocomplete="off"
                         maxlength="500"
                     >
-                    <button type="submit" class="btn-send" title="Send message">
+                    <button type="submit" class="btn-send" title="Ipadala">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                             <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
@@ -173,47 +218,15 @@
         <div class="container">
             <div class="status-icon">
                 <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
-                    <circle cx="40" cy="40" r="35" stroke="#EF4444" stroke-width="3" fill="none"/>
-                    <path d="M28 28L52 52M52 28L28 52" stroke="#EF4444" stroke-width="3" stroke-linecap="round"/>
+                    <circle cx="40" cy="40" r="35" stroke="#DDB892" stroke-width="3" fill="none"/>
+                    <path d="M28 28L52 52M52 28L28 52" stroke="#0B6E4F" stroke-width="3" stroke-linecap="round"/>
                 </svg>
             </div>
-            <h2 class="status-title">Chat Ended</h2>
-            <p class="status-message" id="disconnect-message">Your partner left the chat.</p>
+            <h2 class="status-title">Natapos ang Chat</h2>
+            <p class="status-message" id="disconnect-message">Umalis ang iyong ka-chat.</p>
             
-            <!-- Referral Share Section -->
-            <div class="referral-section">
-                <h3 class="referral-title">💬 Enjoyed your Sulyap?</h3>
-                <p class="referral-subtitle">Invite a friend to try it too!</p>
-                <div class="referral-link-container">
-                    <input type="text" id="referral-link-input" class="referral-link-input" readonly value="https://sulyap.onrender.com">
-                    <button id="copy-link-btn" class="btn-copy" title="Copy link">
-                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                            <rect x="6" y="6" width="10" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/>
-                            <path d="M12 6V4C12 2.89543 11.1046 2 10 2H4C2.89543 2 2 2.89543 2 4V10C2 11.1046 2.89543 12 4 12H6" stroke="currentColor" stroke-width="1.5"/>
-                        </svg>
-                    </button>
-                </div>
-                <div class="share-buttons">
-                    <button class="share-btn facebook" title="Share on Facebook">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                        </svg>
-                    </button>
-                    <button class="share-btn messenger" title="Share on Messenger">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 0C5.373 0 0 5.084 0 11.667c0 3.467 1.4 6.639 3.733 8.933v3.4l3.267-1.8c.867.233 1.8.4 2.733.4 6.627 0 12-5.084 12-11.667C24 5.084 18.627 0 12 0zm1.2 15.667l-3.067-3.267-6 3.267 6.6-7 3.134 3.267 5.933-3.267-6.6 7z"/>
-                        </svg>
-                    </button>
-                    <button class="share-btn twitter" title="Share on Twitter">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-            
-            <button id="new-chat-btn" class="btn btn-primary" aria-label="Start a new chat conversation">Start New Chat</button>
-            <button id="feedback-btn" class="btn btn-secondary" aria-label="Provide feedback about your experience">Give Feedback</button>
+            <button id="new-chat-btn" class="btn btn-primary">Maghanap ng Bagong Ka-chat</button>
+            <button id="feedback-btn" class="btn btn-secondary">Mag-iwan ng Feedback</button>
         </div>
     </div>
 
@@ -230,11 +243,11 @@
                 </div>
                 <p class="modal-message">Aalis ka na?</p>
             </div>
-            <h3 class="modal-title">End this Sulyap?</h3>
-            <p class="modal-subtitle">Your conversation will disappear forever...</p>
+            <h3 class="modal-title">Tapusin ang Sulyap?</h3>
+            <p class="modal-subtitle">Mawawala na ang inyong pag-uusap...</p>
             <div class="modal-buttons">
-                <button id="modal-stay-btn" class="btn btn-secondary">Stay</button>
-                <button id="modal-end-btn" class="btn btn-danger">End Chat</button>
+                <button id="modal-stay-btn" class="btn btn-secondary">Manatili</button>
+                <button id="modal-end-btn" class="btn btn-danger">Tapusin</button>
             </div>
         </div>
     </div>
@@ -247,11 +260,11 @@
                     <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                 </svg>
             </button>
-            <h3 class="modal-title">💭 Share Your Sulyap</h3>
-            <p class="modal-subtitle">Help us improve your experience</p>
+            <h3 class="modal-title">💭 Ano'ng say mo?</h3>
+            <p class="modal-subtitle">Tulungan kaming mapabuti ang Sulyap</p>
             
             <div class="rating-section">
-                <p class="rating-label">How was your experience?</p>
+                <p class="rating-label">Kamusta ang iyong experience?</p>
                 <div class="star-rating" id="star-rating">
                     <span class="star" data-rating="1">⭐</span>
                     <span class="star" data-rating="2">⭐</span>
@@ -265,7 +278,7 @@
                 <textarea 
                     id="feedback-text" 
                     class="feedback-textarea" 
-                    placeholder="Tell us your thoughts... (optional)"
+                    placeholder="Ibahagi ang iyong komento... (opsyonal)"
                     maxlength="500"
                     rows="4"
                 ></textarea>
@@ -275,7 +288,7 @@
             </div>
             
             <div class="modal-buttons">
-                <button id="submit-feedback-btn" class="btn btn-primary">Submit Feedback</button>
+                <button id="submit-feedback-btn" class="btn btn-primary">Ipadala ang Feedback</button>
             </div>
         </div>
     </div>
@@ -284,14 +297,14 @@
     <div id="thankyou-modal" class="modal">
         <div class="modal-content thankyou-modal-content">
             <div class="thankyou-animation">
-                <div class="heart-emoji">💖</div>
+                <div class="heart-emoji">💚</div>
             </div>
             <h3 class="modal-title">Salamat sa iyong Sulyap!</h3>
-            <p class="modal-subtitle">Your feedback helps improve our experience</p>
+            <p class="modal-subtitle">Ang iyong feedback ay makakatulong sa atin</p>
         </div>
     </div>
 
-    <!-- Audio element for notification sound - Matched-Notify.wav -->
+    <!-- Audio element for notification sound -->
     <audio id="notification-sound" preload="auto">
         <source src="assets/sounds/Matched-Notify.wav" type="audio/wav">
     </audio>
@@ -299,6 +312,6 @@
     <!-- Socket.IO Client Library -->
     <script src="/socket.io/socket.io.js"></script>
     <!-- App JavaScript -->
-    <script src="app.js"></script>
+    <script src="app-kambuniyan.js"></script>
 </body>
 </html>
