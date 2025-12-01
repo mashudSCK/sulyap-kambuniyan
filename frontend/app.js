@@ -97,11 +97,10 @@ function displayShoutouts(shouts) {
   }
   
   // Sort by timestamp, newest first
-  const sortedShouts = shouts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  const sortedShouts = shouts.sort((a, b) => new Date(b.timestamp.replace(' ', 'T')) - new Date(a.timestamp.replace(' ', 'T')));
   
   shoutsContainer.innerHTML = sortedShouts.map(shout => {
-    const date = new Date(shout.timestamp);
-    const timeAgo = getTimeAgo(date);
+    const timeAgo = getTimeAgo(shout.timestamp);
     
     return `
       <div class="shoutout-item">
