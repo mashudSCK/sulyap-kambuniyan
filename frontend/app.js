@@ -116,8 +116,12 @@ function displayShoutouts(shouts) {
 }
 
 // Get "time ago" string
-function getTimeAgo(date) {
-  const seconds = Math.floor((new Date() - date) / 1000);
+function getTimeAgo(timestamp) {
+  // Handle both ISO format and space-separated format
+  const dateStr = timestamp.replace(' ', 'T');
+  const date = new Date(dateStr);
+  const now = new Date();
+  const seconds = Math.floor((now - date) / 1000);
   
   if (seconds < 60) return 'just now';
   if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
